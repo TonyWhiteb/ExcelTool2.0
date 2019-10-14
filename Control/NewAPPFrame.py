@@ -22,7 +22,6 @@ class AppFrame(wx.Frame):
         self.file_path = file_path
         self.filesAndLinks = list()
         self.col_dict = {}
-
         # panel = PT.MyPanel(self)
         panel = wx.Panel(self,-1)
         pub.subscribe(self.OnListen, 'GetSelectCol')
@@ -49,7 +48,7 @@ class AppFrame(wx.Frame):
 
         # onButtonHandlers = self.OnListColButton
         # self.buttonpnl = ButtonPanel(panel,onButtonHandlers= onButtonHandlers,size = (-1,100))
-        self.buttonpnl = ButtonPanel(panel, ButtonName_1= 'Select ALL', onButtonHandlers_1= self.onSelectALL ,ButtonName_2= 'List Column', onButtonHandlers_2= self.OnListColButton)
+        self.buttonpnl = ButtonPanel(panel, ButtonName_1= 'List Column', onButtonHandlers_1= self.OnListColButton)
         box_h = wx.BoxSizer(wx.VERTICAL)
         box_v = wx.BoxSizer(wx.HORIZONTAL)
         box_v.AddSpacer(25)
@@ -89,28 +88,23 @@ class AppFrame(wx.Frame):
             total_col = len(col_dict[basename])
             textTuple = (pathname,basename,filetype,total_col)
             dropTarget.WriteTextTuple(textTuple)
-    def ReadFile(self,file_dict):
-        pass
-    def onSelectALL(self,event):
-        pass
+
+
     def OnListColButton(self, event):
-        #TODO: NEXT
-        File_Index_ToOpen = self.filedropctrl.getSelected_id()
-        File_ToOpen = self.filedropctrl.getSelected()
-        print(File_ToOpen)
-        # print(currRow)
-        # FileToOpen = 
-        # try:
-        #     select_path = self.filedropctrl.GetItemText(currRow,col = 0)
-        #     select_name = self.filedropctrl.GetItemText(currRow,col = 1)
-        #     select_type = self.filedropctrl.GetItemText(currRow,col = 2)
-        #     col_info = self.col_dict[select_name]
-        #     ListCol_frame = NLF.ListFrame(currRow,select_name,col_info,self.file_path)
-        #     ListCol_frame.Show()
-        # except TypeError:
-        #     self.Warn('You should select one row or drag one file at least')
-        # except OSError:
-        #     self.Warn('You should select one row or drag one file at least')
+       
+        currRow = self.filedropctrl.GetCurrRow()
+        
+        try:
+            select_path = self.filedropctrl.GetItemText(currRow,col = 0)
+            select_name = self.filedropctrl.GetItemText(currRow,col = 1)
+            select_type = self.filedropctrl.GetItemText(currRow,col = 2)
+            col_info = self.col_dict[select_name]
+            ListCol_frame = NLF.ListFrame(currRow,select_name,col_info,self.file_path)
+            ListCol_frame.Show()
+        except TypeError:
+            self.Warn('You should select one row or drag one file at least')
+        except OSError:
+            self.Warn('You should select one row or drag one file at least')
         
     def Warn(self, message, caption = 'Warning!'):
         dlg = wx.MessageDialog(self, message, caption, wx.OK | wx.ICON_WARNING)
@@ -127,12 +121,11 @@ class FrameListCtrl(wx.ListCtrl, listmix.CheckListCtrlMixin, listmix.ListCtrlAut
         listmix.ListCtrlAutoWidthMixin.__init__(self)
         # self.setResizeColumn(0)
         self.numCols = 4
-        self.entriesList = []
+        
         self.selected = []
         self.selected_id = []
-        self.haveEntries = False
-        self.numEntries = 0
-        self.Bind(wx.EVT_CHECKBOX, self.OnCheckItem)
+
+        self.Bind(wx.EVT_CHECKBOX, self.OCheckItem)
 
     def WriteTextTuple(self, rowDataTuple):
 
@@ -169,53 +162,46 @@ class FrameListCtrl(wx.ListCtrl, listmix.CheckListCtrlMixin, listmix.ListCtrlAut
             finalWid = min(reasonableWid,ColMaxWid)
             self.SetColumnWidth( colIndex, reasonableWid )
 
-    def OnCheckItem(self,index, flag ):
+    def OCheckItem(self,index, flag ):
 
         if flag == True:
-            self.selected.append(self.GetItemText(index,1))
+            self.selected.append(self.GetItemText(index))
             self.selected_id.append(index)
         else:
-            self.selected.remove(self.GetItemText(index,1))
+            self.selected.remove(self.GetItemText(index))
             self.selected_id.remove(index)
 
     def getSelected_id(self):
         return  self.selected_id
 
-    def getSelected(self):
-        return self.selected
-
-    # def GetRows(self):
 
 class ButtonPanel(wx.Panel):
 
-    def __init__(self,parent = None, id = -1,ButtonName_1 = None, onButtonHandlers_1 = None, ButtonName_2 = None, onButtonHandlers_2 = None):
+    def __init__(self,parent = None, id = -1,ButtonName_1 = None, onButtonHandlers_1 = None):
 
         super(ButtonPanel, self).__init__(parent = parent , id = id)
         
         # pub.subscribe(self.OnListen, 'GetSelectCol')
 
         Button_1 = wx.Button(self,-1,ButtonName_1)
-        Button_2 = wx.Button(self,-1,ButtonName_2)
+        # Button_2 = wx.Button(self,-1,ButtonName_2)
 
         Button_1.Bind(wx.EVT_LEFT_DOWN, onButtonHandlers_1)
-        Button_2.Bind(wx.EVT_LEFT_DOWN, onButtonHandlers_2)
+        # Button_2.Bind(wx.EVT_LEFT_DOWN, onButtonHandlers_2)
 
-        btnPanel_innerVertSzr = wx.BoxSizer( wx.VERTICAL )
-        btnPanel_innerVertSzr.AddStretchSpacer( prop=1 )
-        btnPanel_innerVertSzr.Add(Button_1)
-        btnPanel_innerVertSzr.AddSpacer( 5 )
-        btnPanel_innerVertSzr.Add(Button_2)
-        btnPanel_innerVertSzr.AddSpacer( 25 )
+        btnPanel_innerHorzSzr = wx.BoxSizer( wx.HORIZONTAL )
+        btnPanel_innerHorzSzr.AddStretchSpacer( prop=1 )
+        btnPanel_innerHorzSzr.Add(Button_1)
+        btnPanel_innerHorzSzr.AddSpacer( 25 )
+        # btnPanel_innerHorzSzr.Add(Button_2)
+        # btnPanel_innerHorzSzr.AddSpacer( 25 )
 
-        btnPanel_innerVertSzr.AddStretchSpacer( prop=1 )
+        btnPanel_innerHorzSzr.AddStretchSpacer( prop=1 )
 
-        btnPanel_outerVertSzr = wx.BoxSizer( wx.HORIZONTAL )
+        btnPanel_outerVertSzr = wx.BoxSizer( wx.VERTICAL )
         btnPanel_outerVertSzr.AddSpacer( 5 )
-        btnPanel_outerVertSzr.Add( btnPanel_innerVertSzr )
-        btnPanel_outerVertSzr.AddSpacer( 25 )
-
-        # btnPanel_outerHoriSzr = wx.BoxSizer(wx.HORIZONTAL)
-        # bt
+        btnPanel_outerVertSzr.Add( btnPanel_innerHorzSzr, flag=wx.EXPAND )
+        btnPanel_outerVertSzr.AddSpacer( 5 )
 
         self.SetSizer( btnPanel_outerVertSzr )
         self.Layout()
