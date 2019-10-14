@@ -91,8 +91,13 @@ class AppFrame(wx.Frame):
             dropTarget.WriteTextTuple(textTuple)
     def ReadFile(self,file_dict):
         pass
+
     def onSelectALL(self,event):
+        # Curr_Name = event.GetEventObject().GetLabel()
+        # if Curr_Name == 'Select ALL':
+
         pass
+
     def OnListColButton(self, event):
         #TODO: NEXT
         File_Index_ToOpen = self.filedropctrl.getSelected_id()
@@ -196,6 +201,7 @@ class ButtonPanel(wx.Panel):
 
         Button_1 = wx.Button(self,-1,ButtonName_1)
         Button_2 = wx.Button(self,-1,ButtonName_2)
+        # Button_2.SelectedName = 'Unselect ALL'
 
         Button_1.Bind(wx.EVT_LEFT_DOWN, onButtonHandlers_1)
         Button_2.Bind(wx.EVT_LEFT_DOWN, onButtonHandlers_2)
