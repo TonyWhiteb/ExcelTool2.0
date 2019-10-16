@@ -1,4 +1,4 @@
-from Frame import APPFrame
+from Frame import AppFrame
 import sys,os, platform
 import wx
 
@@ -8,7 +8,7 @@ if __name__ == '__main__':
     argc = len(args)
     path = os.path.dirname(os.path.abspath(__file__))
     app = wx.App(redirect = False)
-    appFrame = APPFrame.AppFrame(args, argc
+    appFrame = AppFrame.AppFrame(args, argc
                                    ,file_path = path)
     import wx.lib.inspection
     app.MainLoop()

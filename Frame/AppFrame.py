@@ -91,16 +91,26 @@ class AppFrame(wx.Frame):
             dropTarget.WriteTextTuple(textTuple)
     def ReadFile(self,file_dict):
         pass
-
+    # def onSelectALL(self,event):
+    #     pass
     def onSelectALL(self,event):
-        # Curr_Name = event.GetEventObject().GetLabel()
-        # if Curr_Name == 'Select ALL':
+        Button = event.GetEventObject()
+        Curr_Name = Button.GetLabel()
+        if Curr_Name == 'Select ALL':
+            Button.SetLabel('Unselect ALL')
+            # Button.Refresh()
+            for i in range(self.filedropctrl.numEntries):
+                self.filedropctrl.CheckItem(i,check=True)
+            
+        elif Curr_Name == 'Unselect ALL':
+            Button.SetLabel('Select ALL')
+            for i in range(self.filedropctrl.numEntries):
+                self.filedropctrl.CheckItem(i,check=False)
 
-        pass
 
     def OnListColButton(self, event):
         #TODO: NEXT
-        File_Index_ToOpen = self.filedropctrl.getSelected_id()
+        # File_Index_ToOpen = self.filedropctrl.getSelected_id()
         File_ToOpen = self.filedropctrl.getSelected()
         print(File_ToOpen)
         # print(currRow)
@@ -182,7 +192,7 @@ class FrameListCtrl(wx.ListCtrl, listmix.CheckListCtrlMixin, listmix.ListCtrlAut
         else:
             self.selected.remove(self.GetItemText(index,1))
             self.selected_id.remove(index)
-
+            
     def getSelected_id(self):
         return  self.selected_id
 
@@ -199,18 +209,18 @@ class ButtonPanel(wx.Panel):
         
         # pub.subscribe(self.OnListen, 'GetSelectCol')
 
-        Button_1 = wx.Button(self,-1,ButtonName_1)
-        Button_2 = wx.Button(self,-1,ButtonName_2)
-        # Button_2.SelectedName = 'Unselect ALL'
+        self.Button_1 = wx.Button(self,-1,label = ButtonName_1)
+        self.Button_2 = wx.Button(self,-1,label =  ButtonName_2)
+        # self.Button_2.SelectedName = 'Unselect ALL'
 
-        Button_1.Bind(wx.EVT_LEFT_DOWN, onButtonHandlers_1)
-        Button_2.Bind(wx.EVT_LEFT_DOWN, onButtonHandlers_2)
+        self.Button_1.Bind(wx.EVT_LEFT_DOWN, onButtonHandlers_1)
+        self.Button_2.Bind(wx.EVT_LEFT_DOWN, onButtonHandlers_2)
 
         btnPanel_innerVertSzr = wx.BoxSizer( wx.VERTICAL )
         btnPanel_innerVertSzr.AddStretchSpacer( prop=1 )
-        btnPanel_innerVertSzr.Add(Button_1)
+        btnPanel_innerVertSzr.Add(self.Button_1)
         btnPanel_innerVertSzr.AddSpacer( 5 )
-        btnPanel_innerVertSzr.Add(Button_2)
+        btnPanel_innerVertSzr.Add(self.Button_2)
         btnPanel_innerVertSzr.AddSpacer( 25 )
 
         btnPanel_innerVertSzr.AddStretchSpacer( prop=1 )
