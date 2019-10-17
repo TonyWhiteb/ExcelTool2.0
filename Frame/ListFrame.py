@@ -10,7 +10,7 @@ from Control import PanelTemp as PT
 
 class ListFrame(wx.Frame):
 
-    def __init__(self,index,filename,col_dict,file_path):
+    def __init__(self,index,file_dict):
 
         wx.Frame.__init__(self,None,wx.ID_ANY,"List Columns",pos= (700,300))
         self.SetClientSize((650,400))
@@ -18,8 +18,13 @@ class ListFrame(wx.Frame):
         panel = wx.Panel(self,-1)
 
         # self.col_dict = col_dict
-        self.filename = filename
-        self.file_path = file_path
+        # self.filename = filename
+        self.file_dict = file_dict
+        self.index = index
+        self.file_name = list(self.file_dict.keys())
+        self.file_col = {}
+        # self.col_info = list(self.file_dict.values())
+        # self.file_path = file_path
         self.filelist = []
         self.filedict = {}
 
@@ -27,7 +32,7 @@ class ListFrame(wx.Frame):
         self.list_ctrl.InsertColumn(0,'Column Number',width=wx.LIST_AUTOSIZE_USEHEADER)
         self.list_ctrl.InsertColumn(1,'Column Name')
         self.list_ctrl.InsertColumn(2,'File Name')
-        self.ListColInfo(self.filename,col_dict)
+        self.ListColInfo(self.file_name,self.file_dict)
 
         # helpTextTuple = (' '*40, 'These is no columns in this file')
         # self.list_ctrl.Append(helpTextTuple)
@@ -53,13 +58,18 @@ class ListFrame(wx.Frame):
         self.Centre()
         self.Show()
     def ListColInfo(self,filename,col_dict):
-        col_no = 0
-        for col_name in col_dict.keys():
-            self.list_ctrl.InsertItem(col_no,str(col_no+1)+' '*10)
-            self.list_ctrl.SetItem(col_no,1,col_name)
-            self.list_ctrl.SetItem(col_no,2,filename)
-            col_no = col_no + 1
-        self.col_num = col_no
+        col_insert = 0
+        for file_name in filename:
+            col_no = 0
+            for col_name in self.file_dict[file_name]:
+                # print(col_name)
+                self.list_ctrl.InsertItem(col_insert,str(col_insert+1)+' '*10)
+                self.list_ctrl.SetItem(col_insert,1,col_name)
+                self.list_ctrl.SetItem(col_insert,2,file_name)
+                col_insert = col_insert + 1
+                col_no = col_no + 1
+            self.file_col[file_name] = col_no
+        # self.col_num = col_no
         self.Autosize()
         # file_name = col_dict[0]
         # col_dict = {}

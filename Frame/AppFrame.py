@@ -22,6 +22,7 @@ class AppFrame(wx.Frame):
         self.file_path = file_path
         self.filesAndLinks = list()
         self.col_dict = {}
+        self.file_toopen = {}
 
         # panel = PT.MyPanel(self)
         panel = wx.Panel(self,-1)
@@ -83,14 +84,15 @@ class AppFrame(wx.Frame):
         col_dict = filenameDropDict['col_info']
         self.col_dict.update(col_dict)
         for index in range(len(basename_list)):
+            # self.file_toopen[index] = basename_list[index]
             basename = basename_list[index]
             pathname = pathname_list[index]
             filetype = filetype_list[index]
             total_col = len(col_dict[basename])
             textTuple = (pathname,basename,filetype,total_col)
             dropTarget.WriteTextTuple(textTuple)
-    def ReadFile(self,file_dict):
-        pass
+    # def ReadFile(self,file_dict):
+    #     pass
     # def onSelectALL(self,event):
     #     pass
     def onSelectALL(self,event):
@@ -109,12 +111,35 @@ class AppFrame(wx.Frame):
 
 
     def OnListColButton(self, event):
-        #TODO: NEXT
-        # File_Index_ToOpen = self.filedropctrl.getSelected_id()
+        File_Index_ToOpen = self.filedropctrl.getSelected_id()
         File_ToOpen = self.filedropctrl.getSelected()
-        print(File_ToOpen)
+        File_col_info = {}
+        # File_path = {}
+        # print(type(File_Index_ToOpen))
+        # print(File_Index_ToOpen )
         # print(currRow)
         # FileToOpen = 
+        for num in range(len(File_ToOpen)):
+            # print(File_Index_ToOpen(num) )
+            # currRow = File_Index_ToOpen(num)
+            select_path = self.filedropctrl.GetItemText(File_Index_ToOpen[num], col =0)
+            select_name = self.filedropctrl.GetItemText(File_Index_ToOpen[num], col =1)
+            select_type = self.filedropctrl.GetItemText(File_Index_ToOpen[num], col =2)
+            File_col_info[select_name] = self.col_dict[select_name]
+            # File_path[select_name] = select_path
+        # print(File_col_info)
+        # print(type(File_col_info.keys()))
+        # print(type(File_col_info.values()))
+        # print(list(File_col_info.values()))
+        # ListCol_frame = NLF.ListFrame(File_Index_ToOpen,File_col_info)
+        # ListCol_frame.Show()
+        try:
+            ListCol_frame = NLF.ListFrame(File_Index_ToOpen,File_col_info)
+            ListCol_frame.Show()
+        except TypeError:
+            self.Warn('You should select one row or drag one file at least')
+        except OSError:
+            self.Warn('You should select one row or drag one file at least')
         # try:
         #     select_path = self.filedropctrl.GetItemText(currRow,col = 0)
         #     select_name = self.filedropctrl.GetItemText(currRow,col = 1)
@@ -192,7 +217,7 @@ class FrameListCtrl(wx.ListCtrl, listmix.CheckListCtrlMixin, listmix.ListCtrlAut
         else:
             self.selected.remove(self.GetItemText(index,1))
             self.selected_id.remove(index)
-            
+
     def getSelected_id(self):
         return  self.selected_id
 
