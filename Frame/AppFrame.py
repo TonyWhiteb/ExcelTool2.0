@@ -22,7 +22,9 @@ class AppFrame(wx.Frame):
         self.file_path = file_path
         self.filesAndLinks = list()
         self.col_dict = {}
+        # self.file_list = []
         self.file_toopen = {}
+        self.duplicates = {}
 
         # panel = PT.MyPanel(self)
         panel = wx.Panel(self,-1)
@@ -70,7 +72,30 @@ class AppFrame(wx.Frame):
     def OnListen(self,index,select_col):
     
         self.filedropctrl.SetItem(index,3,str(len(select_col)))
+    # def keys_exists(dict_test,*keys):
+    #     if not isinstance(dict_test, dict):
+    #         raise AttributeError('keys_exists() expects dict as first argument.')
+    #     if len(keys) == 0:
+    #         raise AttributeError('keys_exists() expects at least two arguments, one given.')
 
+    #     _element = dict_test
+    #     for key in keys:
+    #         try:
+    #             _element = _element[key]
+    #         except KeyError:
+    #             return False
+    #     return True
+    # def cols_exists(self,col_dict,col):
+    #     if not isinstance(col_dict, dict):
+    #         raise AttributeError('cols_exists() expects dict as first argument.')
+    #     if len(col) == 0:
+    #         raise AttributeError('cols_exists() expects at least two arguments, one given.')
+
+    #     _element = col_dict
+    #     for k,v in _element:
+    #         for c,n in v:
+    #             try:
+                    
 
     def OnFilesDropped(self, filenameDropDict):
        
@@ -78,14 +103,22 @@ class AppFrame(wx.Frame):
         
         dropCoord = filenameDropDict[ 'coord' ]                 # Not used as yet.
         pathList = filenameDropDict[ 'pathList' ]
-        basename_list = filenameDropDict[ 'basenameList' ]     # leaf folders, not basenames !
+        basename = filenameDropDict[ 'basename' ]     # leaf folders, not basenames !
+        basename_list = filenameDropDict['basenameList']
         pathname_list = filenameDropDict[ 'pathname' ]
         filetype_list = filenameDropDict['filetype']
         col_dict = filenameDropDict['col_info']
+        #TODO: PROCESS DUPLICATES
+        # for k,v in col_dict:
+        #     for col,num in v:
+        #         if self.keys_exists(col_dict,k,col)
+        # self.file_list.append(basename)       
         self.col_dict.update(col_dict)
-        for index in range(len(basename_list)):
-            # self.file_toopen[index] = basename_list[index]
-            basename = basename_list[index]
+        # print(self.file_list)
+        # print(self.col_dict)
+        for index in range(len(basename)):
+            # self.file_toopen[index] = basename[index]
+            basename = basename[index]
             pathname = pathname_list[index]
             filetype = filetype_list[index]
             total_col = len(col_dict[basename])

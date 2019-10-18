@@ -71,6 +71,12 @@ class ListFrame(wx.Frame):
             self.file_col[file_name] = col_no
         # self.col_num = col_no
         self.Autosize()
+
+    # def rmDuplicates(self,event):
+    #     #TODO: NEXT 10/18/2019
+        
+    #     pass
+
         # file_name = col_dict[0]
         # col_dict = {}
         # col_dict = col_dict[1]

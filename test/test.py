@@ -1,4 +1,13 @@
-test = [0]
+data = {
+    "spam": {
+        "egg": {
+            "bacon": "Well..",
+            "sausages": "Spam egg sausages and spam",
+            "spam": "does not have much spam in it"
+        }
+    }
+}
 
-for i in range(len(test)):
-    print(test[i])
+a = data
+
+a = a['egg']

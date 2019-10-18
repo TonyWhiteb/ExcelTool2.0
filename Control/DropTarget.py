@@ -14,7 +14,7 @@ class DropTarget(wx.FileDropTarget):
     #         'errors': 1
     #         'xlsx' : 2
     #     }.get(x,2)
-
+        self.basename_list = []
     def Process_errors(self,afile):
         for line in afile:
             col_info = {}
@@ -30,7 +30,7 @@ class DropTarget(wx.FileDropTarget):
     def OnDropFiles(self, xOrd, yOrd, pathList):
 
         path_list = []
-        basename_list = []
+        basename = []
         filetype_list = []
         col_dict = {}
         for aPath in pathList :
@@ -56,17 +56,24 @@ class DropTarget(wx.FileDropTarget):
             #             break
                         
             path_list.append(pathname)
-            basename_list.append(aBasename)
+            self.basename_list.append(aBasename)
+            basename.append(aBasename)
             filetype_list.append(filetype)
             col_dict[aBasename] = col_info
+            for i, col in enumerate(col_info,0):
+                col_dict[aBasename][col] = i
+            
 
         filenameDropDict = {}
         filenameDropDict['coord'] = (xOrd,yOrd)
         filenameDropDict['pathList'] = pathList
         filenameDropDict['pathname'] = path_list
-        filenameDropDict['basenameList'] = basename_list
+        filenameDropDict['basename'] = basename
+        filenameDropDict['basenameList'] = self.basename_list
         filenameDropDict['filetype'] = filetype_list
         filenameDropDict['col_info'] = col_dict
+        print(self.basename_list)
+        # print(col_dict)
 
         if (hasattr( self.targetControl, 'dropFunc' ))  and  \
            (self.targetControl.dropFunc != None) :
