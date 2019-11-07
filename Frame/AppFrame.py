@@ -124,6 +124,8 @@ class AppFrame(wx.Frame):
             total_col = len(col_dict[basename])
             textTuple = (pathname,basename,filetype,total_col)
             dropTarget.WriteTextTuple(textTuple)
+        
+        # print(self.col_dict)
     # def ReadFile(self,file_dict):
     #     pass
     # def onSelectALL(self,event):
@@ -141,24 +143,78 @@ class AppFrame(wx.Frame):
             Button.SetLabel('Select ALL')
             for i in range(self.filedropctrl.numEntries):
                 self.filedropctrl.CheckItem(i,check=False)
+    # def onProcessDup(self,file_toOpen):
+    #     UnDup = {}
+    #     for num in range(len(File_ToOpen)):
 
-
+    #         select_path = self.filedropctrl.GetItemText(File_Index_ToOpen[num], col =0)
+    #         select_name = self.filedropctrl.GetItemText(File_Index_ToOpen[num], col =1)
+    #         select_type = self.filedropctrl.GetItemText(File_Index_ToOpen[num], col =2)
+        
+    def OnUnduplicates(self,col_dict):
+        UnDuplicates = {}
+        for afile, col_info in self.col_dict.items():
+            for col, index_col in col_info.items():
+                temp_dict = {afile: index_col}
+                
+                if col in UnDuplicates.keys() and afile in UnDuplicates[col].keys():
+                    UnDuplicates[col][afile].append(temp_dict[file_name])
+                elif col in UnDuplicates.keys() and afile not in UnDuplicates[col].keys():
+                    UnDuplicates[col].update(temp_dict)
+                else:
+                    UnDuplicates[col] = temp_dict
+        return UnDuplicates
     def OnListColButton(self, event):
         File_Index_ToOpen = self.filedropctrl.getSelected_id()
         File_ToOpen = self.filedropctrl.getSelected()
         File_col_info = {}
+        UnDuplicates = self.OnUnduplicates(self.col_dict)
         # File_path = {}
         # print(type(File_Index_ToOpen))
         # print(File_Index_ToOpen )
         # print(currRow)
         # FileToOpen = 
+        # print(self.col_dict)
+        # for afile, col_info in self.col_dict.items():
+        #     for col, index_col in col_info.items():
+        #         temp_dict = {afile: index_col}
+                
+        #         if col in UnDuplicates.keys() and afile in UnDuplicates[col].keys():
+        #             UnDuplicates[col][afile].append(temp_dict[file_name])
+        #         elif col in UnDuplicates.keys() and afile not in UnDuplicates[col].keys():
+        #             UnDuplicates[col].update(temp_dict)
+        #         else:
+        #             UnDuplicates[col] = temp_dict
+
         for num in range(len(File_ToOpen)):
-            # print(File_Index_ToOpen(num) )
+        #     # print(File_Index_ToOpen(num) )
             # currRow = File_Index_ToOpen(num)
+        #     temp_dict = {}
             select_path = self.filedropctrl.GetItemText(File_Index_ToOpen[num], col =0)
             select_name = self.filedropctrl.GetItemText(File_Index_ToOpen[num], col =1)
             select_type = self.filedropctrl.GetItemText(File_Index_ToOpen[num], col =2)
             File_col_info[select_name] = self.col_dict[select_name]
+            
+        # # pass
+        #     for col, index_col in self.col_dict[select_name].items():
+        #         temp_dict[select_name] = index_col
+        #         if col in UnDuplicates.keys():
+        #             UnDuplicates[col][select_name] = index_col
+        #         else:
+        #             UnDuplicates[col] = temp_dict
+                # print(temp_dict)
+                # if (col  in UnDuplicates.keys()) :
+
+                #     # UnDuplicates[col] = temp_dict
+                #     UnDuplicates[col][select_name].append( index_col)
+                #     print(UnDuplicates)
+                #     # print(UnDuplicates)
+                # else:
+                #     UnDuplicates[col] = temp_dict
+                #     # print(UnDuplicates)
+                    # UnDuplicates[col][select_name].append( index_col) 
+        
+        # print(UnDuplicates)
             # File_path[select_name] = select_path
         # print(File_col_info)
         # print(type(File_col_info.keys()))
@@ -167,7 +223,7 @@ class AppFrame(wx.Frame):
         # ListCol_frame = NLF.ListFrame(File_Index_ToOpen,File_col_info)
         # ListCol_frame.Show()
         try:
-            ListCol_frame = NLF.ListFrame(File_Index_ToOpen,File_col_info)
+            ListCol_frame = NLF.ListFrame(File_Index_ToOpen,File_col_info,UnDuplicates)
             ListCol_frame.Show()
         except TypeError:
             self.Warn('You should select one row or drag one file at least')

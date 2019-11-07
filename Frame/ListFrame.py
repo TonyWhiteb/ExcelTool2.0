@@ -7,6 +7,7 @@ import  wx.lib.mixins.listctrl  as  listmix
 from Control import FileCtrl as fc
 # from Control import Button as BT
 from Control import PanelTemp as PT
+import pysnooper
 
 class ListFrame(wx.Frame):
 
@@ -23,6 +24,7 @@ class ListFrame(wx.Frame):
         self.index = index
         self.file_name = list(self.file_dict.keys())
         self.file_col = {}
+        # self.Unduplicates = Unduplicates
         # self.col_info = list(self.file_dict.values())
         # self.file_path = file_path
         self.filelist = []
@@ -41,8 +43,10 @@ class ListFrame(wx.Frame):
         self.list_ctrl.SetColumnWidth(2,wx.LIST_AUTOSIZE_USEHEADER)
 
         # onButtonHandlers = self.onSelectCol
-        self.buttonpnl = ButtonPanel(panel, ButtonName_1= 'Save Columns', onButtonHandlers_1= self.onSelectCol, ButtonName_2= 'Select ALL', onButtonHandlers_2= self.onSelectAll, ButtonName_3= 'Unselect All', onButtonHandlers_3= self.onUnselectAll)
-
+        self.buttonpnl = ButtonPanel(panel, ButtonName_1= 'Save Columns', onButtonHandlers_1= self.onSelectCol,\
+                                            ButtonName_2= 'Select ALL', onButtonHandlers_2= self.onSelectAll, \
+                                            ButtonName_3= 'Unselect All', onButtonHandlers_3= self.onUnselectAll,\
+                                            ButtonName_4= 'Unduplicates', onButtonHandlers_4= self.UndupAll)
         box_h = wx.BoxSizer(wx.HORIZONTAL)
         box_v = wx.BoxSizer(wx.VERTICAL)
         box_v.AddSpacer(25)
@@ -57,12 +61,40 @@ class ListFrame(wx.Frame):
         panel.Fit()
         self.Centre()
         self.Show()
+    @pysnooper.snoop('undup.log')
+    def Undup(self):
+        col_no = self.list_ctrl.GetItemCount()
+        # col_no_list = [i for i in range(col_no)]
+        temp_dict = {}
+        for row in range(col_no):
+            temp_list = []
+            temp_col = self.list_ctrl.GetItemText(row,1)
+            for row_nested in range(col_no):
+                if temp_col == self.list_ctrl.GetItemText(row_nexted,1):
+                    temp_list.append(row_nested)
+                else:
+                    continue
+
+            temp_dict[temp_col] = temp_list
+        return temp_dict
+    
+    def UndupALL(self,event):
+        self.list_ctrl.ClearAll()
+        col_insert = 0
+
+        pass
+
+            
+                
+            
     def ListColInfo(self,filename,col_dict):
+        ListCol_dict = {}
         col_insert = 0
         for file_name in filename:
             col_no = 0
             for col_name in self.file_dict[file_name]:
                 # print(col_name)
+                ListCol_dict[col_name] = []
                 self.list_ctrl.InsertItem(col_insert,str(col_insert+1)+' '*10)
                 self.list_ctrl.SetItem(col_insert,1,col_name)
                 self.list_ctrl.SetItem(col_insert,2,file_name)
@@ -250,7 +282,10 @@ class ListColCtrl(wx.ListCtrl, listmix.CheckListCtrlMixin, listmix.ListCtrlAutoW
 
 class ButtonPanel(wx.Panel):
 
-    def __init__(self,parent = None, id = -1,ButtonName_1 = None, onButtonHandlers_1 = None, ButtonName_2 = None, onButtonHandlers_2 = None, ButtonName_3 = None, onButtonHandlers_3 = None):
+    def __init__(self,parent = None, id = -1,ButtonName_1 = None, onButtonHandlers_1 = None,\
+                                             ButtonName_2 = None, onButtonHandlers_2 = None,\
+                                             ButtonName_3 = None, onButtonHandlers_3 = None,\
+                                             ButtonName_4 = None, onButtonHandlers_4 = None):
 
         super(ButtonPanel, self).__init__(parent = parent , id = id)
         
@@ -259,10 +294,12 @@ class ButtonPanel(wx.Panel):
         self.Button_1 = wx.Button(self,-1,ButtonName_1)
         self.Button_2 = wx.Button(self,-1,ButtonName_2)
         self.Button_3 = wx.Button(self,-1,ButtonName_3)
+        self.Button_4 = wx.Button(self,-1,ButtonName_4)
 
         self.Button_1.Bind(wx.EVT_LEFT_DOWN, onButtonHandlers_1)
         self.Button_2.Bind(wx.EVT_LEFT_DOWN, onButtonHandlers_2)
         self.Button_3.Bind(wx.EVT_LEFT_DOWN, onButtonHandlers_3)
+        self.Button_4.Bind(wx.EVT_LEFT_DOWN, onButtonHandlers_4)
 
         btnPanel_innerHorzSzr = wx.BoxSizer( wx.HORIZONTAL )
         btnPanel_innerHorzSzr.AddStretchSpacer( prop=1 )
@@ -271,6 +308,8 @@ class ButtonPanel(wx.Panel):
         btnPanel_innerHorzSzr.Add(self.Button_2)
         btnPanel_innerHorzSzr.AddSpacer( 25 )
         btnPanel_innerHorzSzr.Add(self.Button_3)
+        btnPanel_innerHorzSzr.AddSpacer( 25 )
+        btnPanel_innerHorzSzr.Add(self.Button_4)
         btnPanel_innerHorzSzr.AddSpacer( 25 )
 
         btnPanel_innerHorzSzr.AddStretchSpacer( prop=1 )

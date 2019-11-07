@@ -72,7 +72,7 @@ class DropTarget(wx.FileDropTarget):
         filenameDropDict['basenameList'] = self.basename_list
         filenameDropDict['filetype'] = filetype_list
         filenameDropDict['col_info'] = col_dict
-        print(self.basename_list)
+        # print(self.basename_list)
         # print(col_dict)
 
         if (hasattr( self.targetControl, 'dropFunc' ))  and  \

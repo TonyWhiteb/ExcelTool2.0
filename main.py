@@ -12,3 +12,4 @@ if __name__ == '__main__':
                                    ,file_path = path)
     import wx.lib.inspection
     app.MainLoop()
+ 
