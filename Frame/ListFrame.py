@@ -71,7 +71,7 @@ class ListFrame(wx.Frame):
             temp_col = self.list_ctrl.GetItemText(row,1)
             for row_nested in range(col_no):
                 if temp_col == self.list_ctrl.GetItemText(row_nexted,1):
-                    temp_list.append(row_nested)
+                    temp_list.append(self.list_ctrl.GetItemText(row_nexted,2))
                 else:
                     continue
 
