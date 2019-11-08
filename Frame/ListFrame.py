@@ -46,7 +46,7 @@ class ListFrame(wx.Frame):
         self.buttonpnl = ButtonPanel(panel, ButtonName_1= 'Save Columns', onButtonHandlers_1= self.onSelectCol,\
                                             ButtonName_2= 'Select ALL', onButtonHandlers_2= self.onSelectAll, \
                                             ButtonName_3= 'Unselect All', onButtonHandlers_3= self.onUnselectAll,\
-                                            ButtonName_4= 'Unduplicates', onButtonHandlers_4= self.UndupAll)
+                                            ButtonName_4= 'Unduplicates', onButtonHandlers_4= self.UndupALL)
         box_h = wx.BoxSizer(wx.HORIZONTAL)
         box_v = wx.BoxSizer(wx.VERTICAL)
         box_v.AddSpacer(25)
@@ -61,7 +61,7 @@ class ListFrame(wx.Frame):
         panel.Fit()
         self.Centre()
         self.Show()
-    @pysnooper.snoop('undup.log')
+    # @pysnooper.snoop('undup.log')
     def Undup(self):
         col_no = self.list_ctrl.GetItemCount()
         # col_no_list = [i for i in range(col_no)]
@@ -70,19 +70,26 @@ class ListFrame(wx.Frame):
             temp_list = []
             temp_col = self.list_ctrl.GetItemText(row,1)
             for row_nested in range(col_no):
-                if temp_col == self.list_ctrl.GetItemText(row_nexted,1):
-                    temp_list.append(self.list_ctrl.GetItemText(row_nexted,2))
+                if temp_col == self.list_ctrl.GetItemText(row_nested,1):
+                    temp_list.append(self.list_ctrl.GetItemText(row_nested,2))
                 else:
                     continue
 
             temp_dict[temp_col] = temp_list
         return temp_dict
-    
+    @pysnooper.snoop('UndupALL.log')
     def UndupALL(self,event):
-        self.list_ctrl.ClearAll()
+        UndupALL = self.Undup()
+        self.list_ctrl.DeleteAllItems()
         col_insert = 0
+        for col, filelist in UndupALL.items():
+            strfile = ', '.join([str(item) for item in filelist])
+            self.list_ctrl.InsertItem(col_insert,str(col_insert+1)+' '*10)
+            self.list_ctrl.SetItem(col_insert,1,col)
+            self.list_ctrl.SetItem(col_insert,2,strfile)
+            col_insert = col_insert + 1
 
-        pass
+
 
             
                 

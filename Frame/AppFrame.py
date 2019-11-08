@@ -223,7 +223,7 @@ class AppFrame(wx.Frame):
         # ListCol_frame = NLF.ListFrame(File_Index_ToOpen,File_col_info)
         # ListCol_frame.Show()
         try:
-            ListCol_frame = NLF.ListFrame(File_Index_ToOpen,File_col_info,UnDuplicates)
+            ListCol_frame = NLF.ListFrame(File_Index_ToOpen,File_col_info)
             ListCol_frame.Show()
         except TypeError:
             self.Warn('You should select one row or drag one file at least')
