@@ -15,7 +15,7 @@ class ListFrame(wx.Frame):
 
         wx.Frame.__init__(self,None,wx.ID_ANY,"List Columns",pos= (700,300))
         self.SetClientSize((650,400))
-        self.index = index
+        # self.index = index
         panel = wx.Panel(self,-1)
 
         # self.col_dict = col_dict
@@ -184,15 +184,19 @@ class ListFrame(wx.Frame):
         #         self.list_ctrl.CheckItem(col)
 
     def onSelectCol(self,event):
-
+        #TODO: 
         self.index_select = self.list_ctrl.getSelected_id()
-
-        pub.sendMessage( 'GetSelectCol',index = self.index,select_col= self.index_select)
+        for col_index in self.index_select:
+            filelist = list(self.list_ctrl.GetItemText(col_index,2).split(', '))
+            
+            print(filelist)
+        pass
+        # pub.sendMessage( 'GetSelectCol',index = self.index,select_col= self.index_select)
         # print(self.index_select)
-        self.Close()
+        # self.Close()
         # print(self.GetParent())
 
-        # dlg = wx.FileDialog(
+        # dlg = wx.FileDialog( 
         #       self, message = "Save File As",
         #       defaultDir=self.currentDirectory,
         #       defaultFile = "",wildcard="Excel files (*.xlsx)|*.xlsx",
