@@ -8,6 +8,7 @@ from Control import FileCtrl as fc
 # from Control import Button as BT
 from Control import PanelTemp as PT
 import pysnooper
+from collections import Counter
 
 class ListFrame(wx.Frame):
 
@@ -184,16 +185,17 @@ class ListFrame(wx.Frame):
         #         self.list_ctrl.CheckItem(col)
 
     def onSelectCol(self,event):
-        #TODO: 
+
         self.index_select = self.list_ctrl.getSelected_id()
+        file_list = []
         for col_index in self.index_select:
             filelist = list(self.list_ctrl.GetItemText(col_index,2).split(', '))
-            
-            print(filelist)
-        pass
-        # pub.sendMessage( 'GetSelectCol',index = self.index,select_col= self.index_select)
+            file_list.extend(filelist)
+        file_dict = dict(Counter(file_list))
+        # print(file_dict)
+        pub.sendMessage( 'GetSelectCol',file_dict = file_dict)
         # print(self.index_select)
-        # self.Close()
+        self.Close()
         # print(self.GetParent())
 
         # dlg = wx.FileDialog( 
