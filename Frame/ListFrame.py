@@ -78,7 +78,7 @@ class ListFrame(wx.Frame):
 
             temp_dict[temp_col] = temp_list
         return temp_dict
-    @pysnooper.snoop('UndupALL.log')
+    # @pysnooper.snoop('UndupALL.log')
     def UndupALL(self,event):
         UndupALL = self.Undup()
         self.list_ctrl.DeleteAllItems()

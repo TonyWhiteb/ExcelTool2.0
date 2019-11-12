@@ -6,7 +6,7 @@ from Control import FileCtrl as FC
 # from Control import Button as BT
 from Control import PanelTemp as PT
 from Frame import ListFrame as NLF
-
+import pysnooper
 from collections import defaultdict
 from wx.lib.pubsub import pub
 
@@ -69,9 +69,22 @@ class AppFrame(wx.Frame):
         self.Centre()
         self.Show()
     # def OnColInfo(self,col_info):
-    def OnListen(self,index,select_col):
+
+    def OnListen(self,file_dict):
         #TODO:
-        self.filedropctrl.SetItem(index,3,str(len(select_col)))
+        # with pysnooper.snoop():
+        print(self.col_num)
+        for index in range(self.col_num):
+        
+            # with pysnooper.snoop():
+            file_name = self.filedropctrl.GetItemText(index,1)
+            if file_name in file_dict.keys():
+                self.filedropctrl.SetItem(index,3,str(file_dict[file_name]))
+                continue
+            else:
+                continue
+
+        # self.filedropctrl.SetItem(index,3,str(len(select_col)))
     # def keys_exists(dict_test,*keys):
     #     if not isinstance(dict_test, dict):
     #         raise AttributeError('keys_exists() expects dict as first argument.')
@@ -116,6 +129,8 @@ class AppFrame(wx.Frame):
         self.col_dict.update(col_dict)
         # print(self.file_list)
         # print(self.col_dict)
+        print(basename_list)
+        self.col_num = len(basename_list)
         for index in range(len(basename)):
             # self.file_toopen[index] = basename[index]
             basename = basename[index]
