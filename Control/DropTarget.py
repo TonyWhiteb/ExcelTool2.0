@@ -3,6 +3,7 @@ import os,sys
 import pandas as pd
 from pandas import ExcelWriter
 from pandas import ExcelFile
+import pysnooper
 
 class DropTarget(wx.FileDropTarget):
     def __init__(self,targetControl):
@@ -15,18 +16,21 @@ class DropTarget(wx.FileDropTarget):
     #         'xlsx' : 2
     #     }.get(x,2)
         self.basename_list = []
-    def Process_errors(self,afile):
-        for line in afile:
-            col_info = {}
-            afile_list = line.split('\t')
-            col_info= col_info.fromkeys(afile_list)
-            return col_info
-    def Process_xlsx(self,afile):
-        for line in afile:
-            col_info = {}
-            afile_list = line.split('\t')
-            col_info= col_info.fromkeys(afile_list)
-            return col_info
+    # @pysnooper.snoop('Process_error.log')
+    def Process_errors(self,aBasename):
+        with open(aBasename) as afile:
+            for line in afile:
+                col_info = {}
+                afile_list = line.split('\t')
+                col_info= col_info.fromkeys(afile_list)
+                return col_info
+    # @pysnooper.snoop('Process_xlsx.log')
+    def Process_xlsx(self,aBasename):
+        data = pd.read_excel(aBasename)
+        col_info = {}
+        col_info = col_info.fromkeys(data.columns.values)
+        return col_info
+    # @pysnooper.snoop('OnDropFiles.log')
     def OnDropFiles(self, xOrd, yOrd, pathList):
 
         path_list = []
@@ -43,8 +47,11 @@ class DropTarget(wx.FileDropTarget):
             os.chdir(pathname)
             method_name = 'Process_' +str(filetype)
             method = getattr(self,method_name)
-            with open(aBasename) as afile:
-                col_info = method(afile)
+            col_info = method(aBasename)
+            print(col_info)
+            # with open(aBasename) as afile:
+                # print(type(afile))
+                
             # if filetype == 'errors':
 
             #     col_info = []
