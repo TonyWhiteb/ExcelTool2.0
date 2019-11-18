@@ -28,8 +28,8 @@ class ListFrame(wx.Frame):
         # self.Unduplicates = Unduplicates
         # self.col_info = list(self.file_dict.values())
         # self.file_path = file_path
-        self.filelist = []
-        self.filedict = {}
+        # self.filelist = []
+        # self.filedict = {}
 
         self.list_ctrl = ListColCtrl(panel, size = (500,304),style = wx.LC_REPORT|wx.BORDER_SUNKEN)
         self.list_ctrl.InsertColumn(0,'Column Number',width=wx.LIST_AUTOSIZE_USEHEADER)
@@ -65,6 +65,7 @@ class ListFrame(wx.Frame):
     # @pysnooper.snoop('undup.log')
     def Undup(self):
         col_no = self.list_ctrl.GetItemCount()
+        self.col_num = col_no
         # col_no_list = [i for i in range(col_no)]
         temp_dict = {}
         for row in range(col_no):
@@ -81,6 +82,9 @@ class ListFrame(wx.Frame):
     # @pysnooper.snoop('UndupALL.log')
     def UndupALL(self,event):
         UndupALL = self.Undup()
+        for col in range(self.col_num):
+            if self.list_ctrl.IsChecked(col) == True:
+                self.list_ctrl.ToggleItem(col)
         self.list_ctrl.DeleteAllItems()
         col_insert = 0
         for col, filelist in UndupALL.items():
@@ -186,12 +190,20 @@ class ListFrame(wx.Frame):
 
     def onSelectCol(self,event):
 
+        file_dict = {}
+        # file_list = self.file_name
+        for file_name in self.file_name:
+            file_dict[file_name] = []
+        # col_no = 0
+
         self.index_select = self.list_ctrl.getSelected_id()
-        file_list = []
+
         for col_index in self.index_select:
             filelist = list(self.list_ctrl.GetItemText(col_index,2).split(', '))
-            file_list.extend(filelist)
-        file_dict = dict(Counter(file_list))
+            for file_name in filelist:
+                file_dict[file_name].append(self.list_ctrl.GetItemText(col_index,1))
+        #     file_list.extend(filelist)
+        # file_dict = dict(Counter(file_list))
         # print(file_dict)
         pub.sendMessage( 'GetSelectCol',file_dict = file_dict)
         # print(self.index_select)

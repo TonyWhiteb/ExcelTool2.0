@@ -71,18 +71,19 @@ class AppFrame(wx.Frame):
     # def OnColInfo(self,col_info):
 
     def OnListen(self,file_dict):
+        print(file_dict)
         #TODO:
         # with pysnooper.snoop():
-        print(self.col_num)
-        for index in range(self.col_num):
+        # print(self.col_num)
+        # for index in range(self.col_num):
         
-            # with pysnooper.snoop():
-            file_name = self.filedropctrl.GetItemText(index,1)
-            if file_name in file_dict.keys():
-                self.filedropctrl.SetItem(index,3,str(file_dict[file_name]))
-                continue
-            else:
-                continue
+        #     # with pysnooper.snoop():
+        #     file_name = self.filedropctrl.GetItemText(index,1)
+        #     if file_name in file_dict.keys():
+        #         self.filedropctrl.SetItem(index,3,str(file_dict[file_name]))
+        #         continue
+        #     else:
+        #         continue
 
         # self.filedropctrl.SetItem(index,3,str(len(select_col)))
     # def keys_exists(dict_test,*keys):
