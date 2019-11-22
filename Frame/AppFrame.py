@@ -9,7 +9,9 @@ from Frame import ListFrame as NLF
 import pysnooper
 from collections import defaultdict
 from wx.lib.pubsub import pub
-
+import pandas as pd
+from pandas import ExcelWriter
+from pandas import ExcelFile
 
 class AppFrame(wx.Frame):
 
@@ -20,11 +22,13 @@ class AppFrame(wx.Frame):
 
         self.SetBackgroundColour(wx.WHITE)
         self.file_path = file_path
+        self.currentDirectory = os.getcwd()
         self.filesAndLinks = list()
         self.col_dict = {}
         # self.file_list = []
         self.file_toopen = {}
         self.duplicates = {}
+        self.file_dict = {}
 
         # panel = PT.MyPanel(self)
         panel = wx.Panel(self,-1)
@@ -52,7 +56,12 @@ class AppFrame(wx.Frame):
 
         # onButtonHandlers = self.OnListColButton
         # self.buttonpnl = ButtonPanel(panel,onButtonHandlers= onButtonHandlers,size = (-1,100))
-        self.buttonpnl = ButtonPanel(panel, ButtonName_1= 'Select ALL', onButtonHandlers_1= self.onSelectALL ,ButtonName_2= 'List Column', onButtonHandlers_2= self.OnListColButton)
+        self.buttonpnl = ButtonPanel(panel, ButtonName_1= 'Select ALL', \
+                                            onButtonHandlers_1= self.onSelectALL ,\
+                                            ButtonName_2= 'List Column', \
+                                            onButtonHandlers_2= self.OnListColButton,\
+                                            ButtonName_3= 'Combine ALL',\
+                                            onButtonHandlers_3 = self.TEST )
         box_h = wx.BoxSizer(wx.VERTICAL)
         box_v = wx.BoxSizer(wx.HORIZONTAL)
         box_v.AddSpacer(25)
@@ -71,20 +80,23 @@ class AppFrame(wx.Frame):
     # def OnColInfo(self,col_info):
 
     def OnListen(self,file_dict):
-        print(file_dict)
+        # print(file_dict)
         #TODO:
         # with pysnooper.snoop():
         # print(self.col_num)
-        # for index in range(self.col_num):
+        for afile in file_dict.keys():
+            if afile in self.file_dict.keys():
+                self.file_dict[afile] = file_dict[afile]
+        for index in range(self.col_num):
         
-        #     # with pysnooper.snoop():
-        #     file_name = self.filedropctrl.GetItemText(index,1)
-        #     if file_name in file_dict.keys():
-        #         self.filedropctrl.SetItem(index,3,str(file_dict[file_name]))
-        #         continue
-        #     else:
-        #         continue
-
+        # #     # with pysnooper.snoop():
+            file_name = self.filedropctrl.GetItemText(index,1)
+            if file_name in file_dict.keys():
+                self.filedropctrl.SetItem(index,3,str(len(file_dict[file_name])))
+                continue
+            else:
+                continue
+        # print(self.file_dict)
         # self.filedropctrl.SetItem(index,3,str(len(select_col)))
     # def keys_exists(dict_test,*keys):
     #     if not isinstance(dict_test, dict):
@@ -110,7 +122,7 @@ class AppFrame(wx.Frame):
     #         for c,n in v:
     #             try:
                     
-
+    # @pysnooper.snoop('FileDrop.log')
     def OnFilesDropped(self, filenameDropDict):
        
         dropTarget = self.filedropctrl
@@ -122,15 +134,18 @@ class AppFrame(wx.Frame):
         pathname_list = filenameDropDict[ 'pathname' ]
         filetype_list = filenameDropDict['filetype']
         col_dict = filenameDropDict['col_info']
+        self.col_dict.update(col_dict)
+        # print(self.col_dict[basename[0]].keys())
+        self.file_dict[basename[0]]=  list(self.col_dict[basename[0]].keys())
         #TODO: PROCESS DUPLICATES
         # for k,v in col_dict:
         #     for col,num in v:
         #         if self.keys_exists(col_dict,k,col)
         # self.file_list.append(basename)       
-        self.col_dict.update(col_dict)
+        
         # print(self.file_list)
-        # print(self.col_dict)
-        print(basename_list)
+        # print(self.file_dict)
+        # print(basename_list)
         self.col_num = len(basename_list)
         for index in range(len(basename)):
             # self.file_toopen[index] = basename[index]
@@ -166,7 +181,58 @@ class AppFrame(wx.Frame):
     #         select_path = self.filedropctrl.GetItemText(File_Index_ToOpen[num], col =0)
     #         select_name = self.filedropctrl.GetItemText(File_Index_ToOpen[num], col =1)
     #         select_type = self.filedropctrl.GetItemText(File_Index_ToOpen[num], col =2)
+    def TEST(self,event):
+        file_count = self.filedropctrl.GetItemCount()
+        column_name = []
+
+        for filename in self.file_dict.keys():
+    
+            for i in range(file_count):
+                if filename == self.filedropctrl.GetItemText(i,1):
+                
+                    column_name += self.file_dict[filename]
+            df_final = pd.DataFrame(columns = column_name)
         
+        for key in self.file_dict
+        print(df_final)
+    def readExcel(self,filename,path):
+        os.chdir(path)
+        column_name = []
+        column_name += self.file_dict[filename]
+        df_final = pd.DataFrame(columns = column_name)
+        df = pd.read_excel(filename, sheetname= 'Sheet1')
+        for col in column_name:
+            if 
+
+
+
+
+
+    # def OnCombine(self,event):
+    #     #TODO:
+    #     dlg = wx.FileDialog(
+    #         self, message = "Save File As",
+    #         defaultDir= self.currentDirectory,
+    #         defaultFile= "", wildcard= "Excel Files (*.xlsx)|*.xlsx",
+    #         style= wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT
+    #     )
+    #     if dlg.ShowModal() == wx.ID_OK:
+            
+    #         final_filename = dlg.GetFilename()
+    #         path = dlg.GetPath()
+    #         file_count = self.filedropctrl.GetItemCount()
+    #         column_name = []
+    #         for filename in self.file_dict.keys():
+    #             item_list = []
+    #             for i in range(file_count):
+    #                 if filename == self.filedropctrl.GetItemText(i,1):
+    #                     item_list.append(self.filedropctrl.GetItemText(i,0))
+    #             self.filedict 
+
+
+    #     pass
+
+
     def OnUnduplicates(self,col_dict):
         UnDuplicates = {}
         for afile, col_info in self.col_dict.items():
@@ -333,25 +399,30 @@ class FrameListCtrl(wx.ListCtrl, listmix.CheckListCtrlMixin, listmix.ListCtrlAut
 
 class ButtonPanel(wx.Panel):
 
-    def __init__(self,parent = None, id = -1,ButtonName_1 = None, onButtonHandlers_1 = None, ButtonName_2 = None, onButtonHandlers_2 = None):
+    def __init__(self,parent = None, id = -1,ButtonName_1 = None, onButtonHandlers_1 = None,\
+                                             ButtonName_2 = None, onButtonHandlers_2 = None,\
+                                             ButtonName_3 = None, onButtonHandlers_3 = None):
 
         super(ButtonPanel, self).__init__(parent = parent , id = id)
         
         # pub.subscribe(self.OnListen, 'GetSelectCol')
 
         self.Button_1 = wx.Button(self,-1,label = ButtonName_1)
-        self.Button_2 = wx.Button(self,-1,label =  ButtonName_2)
+        self.Button_2 = wx.Button(self,-1,label = ButtonName_2)
+        self.Button_3 = wx.Button(self,-1,label = ButtonName_3)
         # self.Button_2.SelectedName = 'Unselect ALL'
 
         self.Button_1.Bind(wx.EVT_LEFT_DOWN, onButtonHandlers_1)
         self.Button_2.Bind(wx.EVT_LEFT_DOWN, onButtonHandlers_2)
+        self.Button_3.Bind(wx.EVT_LEFT_DOWN, onButtonHandlers_3)
 
         btnPanel_innerVertSzr = wx.BoxSizer( wx.VERTICAL )
         btnPanel_innerVertSzr.AddStretchSpacer( prop=1 )
         btnPanel_innerVertSzr.Add(self.Button_1)
         btnPanel_innerVertSzr.AddSpacer( 5 )
         btnPanel_innerVertSzr.Add(self.Button_2)
-        btnPanel_innerVertSzr.AddSpacer( 25 )
+        btnPanel_innerVertSzr.AddSpacer( 425 )
+        btnPanel_innerVertSzr.Add(self.Button_3)
 
         btnPanel_innerVertSzr.AddStretchSpacer( prop=1 )
 
