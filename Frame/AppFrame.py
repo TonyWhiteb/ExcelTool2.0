@@ -78,13 +78,18 @@ class AppFrame(wx.Frame):
         self.Centre()
         self.Show()
     # def OnColInfo(self,col_info):
+    def UndupList(self, alist):
+        return list(dict.fromkeys(alist))
 
     def OnListen(self,file_dict):
         # print(file_dict)
         #TODO:
         # with pysnooper.snoop():
         # print(self.col_num)
+        column_list = []
+
         for afile in file_dict.keys():
+            column_list += file_dict[afile]
             if afile in self.file_dict.keys():
                 self.file_dict[afile] = file_dict[afile]
         for index in range(self.col_num):
@@ -96,6 +101,7 @@ class AppFrame(wx.Frame):
                 continue
             else:
                 continue
+        self.df_final = pd.DataFrame(columns = column_list)
         # print(self.file_dict)
         # self.filedropctrl.SetItem(index,3,str(len(select_col)))
     # def keys_exists(dict_test,*keys):
@@ -122,7 +128,7 @@ class AppFrame(wx.Frame):
     #         for c,n in v:
     #             try:
                     
-    # @pysnooper.snoop('FileDrop.log')
+    @pysnooper.snoop('FileDrop.log')
     def OnFilesDropped(self, filenameDropDict):
        
         dropTarget = self.filedropctrl
@@ -135,6 +141,17 @@ class AppFrame(wx.Frame):
         filetype_list = filenameDropDict['filetype']
         col_dict = filenameDropDict['col_info']
         self.col_dict.update(col_dict)
+        if len(basename_list) == 1:
+            self.col_output = *self.col_dict[basename_list[0]].keys()
+            self.df_col = pd.DataFrame(columns = self.col_output)
+        elif len(basename_list) > 1:
+            col_update = *self.col_dict[basename_list[-1]].keys()
+            self.col_output = self.UndupList(self.col_output.append(col_update))
+            self.df_col = self.df_col.reindex(columns = self.col_output)
+
+
+
+
         # print(self.col_dict[basename[0]].keys())
         self.file_dict[basename[0]]=  list(self.col_dict[basename[0]].keys())
         #TODO: PROCESS DUPLICATES
@@ -183,17 +200,16 @@ class AppFrame(wx.Frame):
     #         select_type = self.filedropctrl.GetItemText(File_Index_ToOpen[num], col =2)
     def TEST(self,event):
         file_count = self.filedropctrl.GetItemCount()
-        column_name = []
-
-        for filename in self.file_dict.keys():
-    
-            for i in range(file_count):
-                if filename == self.filedropctrl.GetItemText(i,1):
-                
-                    column_name += self.file_dict[filename]
-            df_final = pd.DataFrame(columns = column_name)
         
-        for key in self.file_dict
+        for i in range(file_count):
+            file_path = self.filedropctrl.GetItemText(i,0)
+            file_name = self.filedropctrl.GetItemText(i,1)
+            file_type = self.filedropctrl.GetItemText(i,2)
+            if file_type == 'xlsx':
+                df_process = self.readExcel(file_name,file_path)
+
+        
+        # for key in self.file_dict
         print(df_final)
     def readExcel(self,filename,path):
         os.chdir(path)
@@ -201,9 +217,9 @@ class AppFrame(wx.Frame):
         column_name += self.file_dict[filename]
         df_final = pd.DataFrame(columns = column_name)
         df = pd.read_excel(filename, sheetname= 'Sheet1')
-        for col in column_name:
-            if 
-
+        df_need = df.loc[:,column_name]
+        df_final = df_fianl.append(df_need)
+        return df_final
 
 
 
