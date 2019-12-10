@@ -1,2 +1,4 @@
 test = [1,2,3]
-print(test[-1])
+a = [4]
+test.append(a)
+print(test) 

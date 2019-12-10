@@ -25,6 +25,7 @@ class AppFrame(wx.Frame):
         self.currentDirectory = os.getcwd()
         self.filesAndLinks = list()
         self.col_dict = {}
+        self.col_output = []
         # self.file_list = []
         self.file_toopen = {}
         self.duplicates = {}
@@ -61,7 +62,7 @@ class AppFrame(wx.Frame):
                                             ButtonName_2= 'List Column', \
                                             onButtonHandlers_2= self.OnListColButton,\
                                             ButtonName_3= 'Combine ALL',\
-                                            onButtonHandlers_3 = self.TEST )
+                                            onButtonHandlers_3 = self.onSaveFile )
         box_h = wx.BoxSizer(wx.VERTICAL)
         box_v = wx.BoxSizer(wx.HORIZONTAL)
         box_v.AddSpacer(25)
@@ -78,6 +79,7 @@ class AppFrame(wx.Frame):
         self.Centre()
         self.Show()
     # def OnColInfo(self,col_info):
+    @pysnooper.snoop('UndupList.log')
     def UndupList(self, alist):
         return list(dict.fromkeys(alist))
 
@@ -141,13 +143,20 @@ class AppFrame(wx.Frame):
         filetype_list = filenameDropDict['filetype']
         col_dict = filenameDropDict['col_info']
         self.col_dict.update(col_dict)
-        if len(basename_list) == 1:
-            self.col_output = *self.col_dict[basename_list[0]].keys()
-            self.df_col = pd.DataFrame(columns = self.col_output)
-        elif len(basename_list) > 1:
-            col_update = *self.col_dict[basename_list[-1]].keys()
-            self.col_output = self.UndupList(self.col_output.append(col_update))
-            self.df_col = self.df_col.reindex(columns = self.col_output)
+        # if len(basename_list) == 1:
+
+        #     self.col_output = list(self.col_dict[basename_list[0]].keys())
+        #     df_col = pd.DataFrame(columns = self.col_output)
+        #     print(self.col_output)
+        # elif len(basename_list) > 1:
+        #     print(self.col_output)
+        #     col_update = list(self.col_dict[basename_list[-1]].keys())
+        #     alist = self.col_output + col_update
+        #     # self.col_output = self.col_output.append(col_update)
+        #     self.col_output = self.UndupList(self.col_output)
+        #     df_col = df_col.reindex(columns = self.col_output)
+        
+        # self.df_all_col = df_col
 
 
 
@@ -198,28 +207,48 @@ class AppFrame(wx.Frame):
     #         select_path = self.filedropctrl.GetItemText(File_Index_ToOpen[num], col =0)
     #         select_name = self.filedropctrl.GetItemText(File_Index_ToOpen[num], col =1)
     #         select_type = self.filedropctrl.GetItemText(File_Index_ToOpen[num], col =2)
-    def TEST(self,event):
+    def onSaveFile(self,event):
         file_count = self.filedropctrl.GetItemCount()
-        
-        for i in range(file_count):
-            file_path = self.filedropctrl.GetItemText(i,0)
-            file_name = self.filedropctrl.GetItemText(i,1)
-            file_type = self.filedropctrl.GetItemText(i,2)
-            if file_type == 'xlsx':
-                df_process = self.readExcel(file_name,file_path)
+        df_final = pd.DataFrame()
+        dlg = wx.FileDialog(
+              self, message = "Save File As",
+              defaultDir=self.currentDirectory,
+              defaultFile = "",wildcard="Excel files (*.xlsx)|*.xlsx",
+              style= wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT
+        )
+        if dlg.ShowModal() == wx.ID_OK:
+            final_filename = dlg.GetFilename()
+            path = dlg.GetPath()
+            for i in range(file_count):
+                file_path = self.filedropctrl.GetItemText(i,0)
+                file_name = self.filedropctrl.GetItemText(i,1)
+                file_type = self.filedropctrl.GetItemText(i,2)
+                if file_type == 'xlsx':
+                    df_process = self.readExcel(file_name,file_path)
+                    df_final = df_final.append(df_process)
+            basename = os.path.split(path)
+            os.chdir(basename[0])
+            # print(filename)
+            writer = ExcelWriter(final_filename)
+            df_final.to_excel(writer,'Sheet1', index = False)
+            writer.save()
 
+        dlg.Destroy()
         
+
+        # print(df_final)
         # for key in self.file_dict
-        print(df_final)
+        # print(df_final)
+    @pysnooper.snoop('readExcel.log')
     def readExcel(self,filename,path):
         os.chdir(path)
         column_name = []
         column_name += self.file_dict[filename]
         df_final = pd.DataFrame(columns = column_name)
-        df = pd.read_excel(filename, sheetname= 'Sheet1')
+        df = pd.read_excel(filename, sheet_name= 'Sheet1')
         df_need = df.loc[:,column_name]
-        df_final = df_fianl.append(df_need)
-        return df_final
+        # df_final = df_fianl.append(df_need)
+        return df_need
 
 
 
