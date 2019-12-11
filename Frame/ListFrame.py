@@ -5,7 +5,6 @@ from wx.lib.pubsub import pub
 from pandas import ExcelWriter
 import  wx.lib.mixins.listctrl  as  listmix
 from Control import FileCtrl as fc
-# from Control import Button as BT
 from Control import PanelTemp as PT
 import pysnooper
 from collections import Counter
@@ -158,14 +157,16 @@ class ListFrame(wx.Frame):
             self.list_ctrl.SetColumnWidth(colIndex,wx.LIST_AUTOSIZE)
     
     def onUnselectAll(self,event):
-        for col in range(self.col_num):
+        col_num = self.list_ctrl.GetItemCount()
+        for col in range(col_num):
             if self.list_ctrl.IsChecked(col) == True:
                 self.list_ctrl.ToggleItem(col)
     
     def onSelectAll(self,event):
-
-        for col in range(self.col_num):
-            self.list_ctrl.CheckItem(col)
+        col_num = self.list_ctrl.GetItemCount()
+        for col in range(col_num):
+            if self.list_ctrl.IsChecked(col) == False:
+                self.list_ctrl.ToggleItem(col)
         # count = 0
         # for col in range(self.col_num):
         #     if self.list_ctrl.IsChecked(col):
