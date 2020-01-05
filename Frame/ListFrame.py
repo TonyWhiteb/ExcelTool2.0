@@ -1,13 +1,19 @@
-import sys,os
+# import sys,os
+
+# from collections import Counter
 import wx
-import pandas as pd
-from wx.lib.pubsub import pub
-from pandas import ExcelWriter
-import  wx.lib.mixins.listctrl  as  listmix
-from Control import FileCtrl as fc
-from Control import PanelTemp as PT
 import pysnooper
-from collections import Counter
+import pandas as pd
+import  wx.lib.mixins.listctrl  as  listmix
+
+from wx.lib.pubsub import pub
+# from pandas import ExcelWriter
+
+
+# from Control import FileCtrl as fc
+# from Control import PanelTemp as PT
+
+
 
 class ListFrame(wx.Frame):
 
@@ -44,7 +50,7 @@ class ListFrame(wx.Frame):
 
         # onButtonHandlers = self.onSelectCol
         self.buttonpnl = ButtonPanel(panel, ButtonName_1= 'Save Columns', onButtonHandlers_1= self.onSelectCol,\
-                                            ButtonName_2= 'Select ALL', onButtonHandlers_2= self.onSelectAll, \
+                                            ButtonName_2= 'Select ALL', onButtonHandlers_2= self.onSelectAll,\
                                             ButtonName_3= 'Unselect All', onButtonHandlers_3= self.onUnselectAll,\
                                             ButtonName_4= 'Unduplicates', onButtonHandlers_4= self.UndupALL)
         box_h = wx.BoxSizer(wx.HORIZONTAL)

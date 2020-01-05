@@ -1,28 +1,30 @@
+# pylint: disable= multiple-imports
+# pylint: disable= C0103
+import os
 import wx
-import sys,os
 import pandas as pd
 from collections import defaultdict
 
 class FileCtrl(wx.ListCtrl):
-    def __init__(self,*args,**kwargs):
-        super(FileCtrl,self).__init__(*args,**kwargs)
+    def __init__(self, *args, **kwargs):
+        super(FileCtrl, self).__init__(*args, **kwargs)
 
         self.currRow = None
 
-        self.Bind(wx.EVT_LEFT_DOWN, self.OnFindCurrentRow )
+        self.Bind(wx.EVT_LEFT_DOWN, self.OnFindCurrentRow)
         self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightDown)
         self.entriesList = []
         self.numEntries = 0
         self.filename = []
         self.numCols = 4
         self.haveEntries = False
-        self.supportfiletype = ['errors','xlsx','sql']
+        self.supportfiletype = ['errors', 'xlsx', 'sql']
 
-    def OnFindCurrentRow(self,event): #find current row control
-        if (self.currRow is not None):
+    def OnFindCurrentRow(self, event): #find current row control
+        if self.currRow is not None:
             self.Select(self.currRow, False)
 
-        row,_ignoredFlags = self.HitTest(event.GetPosition())
+        row, _ignoredFlags = self.HitTest(event.GetPosition())
             # HitTest, Determine which item is at the specified point.
             # Returns index of the item or wxNOT_FOUND if no item is at the specified point.
         self.currRow = row
@@ -31,105 +33,109 @@ class FileCtrl(wx.ListCtrl):
     def GetCurrRow(self):
         return self.currRow
 #TODO: Get Current Row
-    def OnRightDown(self,event): #Right click menu
+    def OnRightDown(self, event): #Right click menu
 
         menu = wx.Menu()
-        menuItem = menu.Append(-1,'Delete this file')
+        menuItem = menu.Append(-1, 'Delete this file')
 
         self.Bind(wx.EVT_MENU, self.OnDeleteRow, menuItem)
 
         self.OnFindCurrentRow(event)
 
-        self.PopupMenu(menu,event.GetPosition())
+        self.PopupMenu(menu, event.GetPosition())
 
     def OnDeleteRow(self, event):
+        pass
 
-        if(self.currRow >= 0):
+    #     if self.currRow >= 0:
 
-            assert(self.numEntries == len(self.entriesList))
+    #         assert self.numEntries == len(self.entriesList)
 
-            # self.DeleteItem(self.currRow)
-            allSelectedRowData = self.GetAllSelectedRowData()
+    #         # self.DeleteItem(self.currRow)
+    #         allSelectedRowData = self.GetAllSelectedRowData()
 
-    def GetAllSelectedRowData(self):
-        allSelectedRowData = []
-        idx = -1
-        while True: #while True loop forever
-            idx = self.GetNextItem(idx,wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
-            #Searches for an item with the given geometry or state,starting from item but excluding the item itself
-            #if item is -1, the first item that matches the specified flags will be returned.
-            #Return the first item with given state following item or -1 if no such item found.
-            if (idx == -1):
-                break
+    # def GetAllSelectedRowData(self):
+    #     allSelectedRowData = []
+    #     idx = -1
+    #     while True: #while True loop forever
+    #         idx = self.GetNextItem(idx, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
+    #         #Searches for an item with the given geometry or state,
+    #         #starting from item but excluding the item itself
+    #         #if item is -1, the first item that matches the specified flags will be returned.
+    #         #Return the first item with given state following item or -1 if no such item found.
+    #         if idx == -1:
+    #             break
 
-            allSelectedRowData.append( self.GetItemInfo(idx))
+    #         allSelectedRowData.append(self.GetItemInfo(idx))
 
-            if (len( allSelectedRowData ) >= 1) :
+    #         if len(allSelectedRowData) >= 1:
 
-                #-----
+    #             #-----
 
-                rawRowData = allSelectedRowData[ 0 ]    # There can be only a single row selected.
-                lineIdx       = rawRowData[ 0 ]
-                unknownData   = rawRowData[ 1 ]
-                textDataTuple = tuple( rawRowData[ 2: ] )   # Make same type as in self.entriesList
+    #             rawRowData = allSelectedRowData[0]    # There can be only a single row selected.
+    #             lineIdx = rawRowData[0]
+    #             unknownData = rawRowData[1]
+    #             textDataTuple = tuple(rawRowData[2:])   # Make same type as in self.entriesList
 
-                if self.numEntries :
+    #             if self.numEntries:
 
-                    try :
-                        entryListIndex = None
-                        entryListIndex = self.entriesList.index( textDataTuple )
-                    except ValueError :
-                        print ('####  ERROR:  textDataTuple NOT FOUND in self.entriesList :')
-                        print (' ', textDataTuple)
-                        print
+    #                 try:
+    #                     entryListIndex = None
+    #                     entryListIndex = self.entriesList.index(textDataTuple)
+    #                 except ValueError:
+    #                     print('####  ERROR:  textDataTuple NOT FOUND in self.entriesList :')
+    #                     print(' ', textDataTuple)
+    #                     # print
 
-                        return
-                        #-----
+    #                     return
+    #                     #-----
 
-                    #end try
+    #                 #end try
 
-                    # Delete this row item from [ self.entriesList ].
-                    del self.entriesList[ entryListIndex ]
+    #                 # Delete this row item from [ self.entriesList ].
+    #                 del self.entriesList[entryListIndex]
 
-                    # Update the status vars.
-                    self.numEntries -= 1
-                    if (self.numEntries < 1) :
+    #                 # Update the status vars.
+    #                 self.numEntries -= 1
+    #                 if self.numEntries < 1:
 
-                        self.haveEntries = False
-                        self.Append( self.HelpTextTuple )
+    #                     self.haveEntries = False
+    #                     self.Append(self.HelpTextTuple)
 
-                    # Finally, detete the textList row item.
-                    self.DeleteItem( self.currRow )
-    def GetItemInfo(self,idx):
+    #                 # Finally, detete the textList row item.
+    #                 self.DeleteItem(self.currRow)
+    def GetItemInfo(self, idx):
         rowItemList = []
         rowItemList.append(idx)
-        rowItemList.append(self.GetItemData(idx)) #Gets the application-defined data associated with this item
-        rowItemList.append(self.GetItemText(idx)) #gets the item text for this item, Column 0 is the default
+        rowItemList.append(self.GetItemData(idx))
+        #Gets the application-defined data associated with this item
+        rowItemList.append(self.GetItemText(idx))
+        #gets the item text for this item, Column 0 is the default
 
-        for i in range(1,self.GetColumnCount()):
+        for i in range(1, self.GetColumnCount()):
             rowItemList.append(self.GetItem(idx, i).GetText())
-
         return rowItemList
-      
-    
+
     def WriteTextTuple(self, rowDataTuple):
 
-        assert(len(rowDataTuple) >= self.numCols), 'Given data must have at least %d items.' %(self.numCols)
+        assert(len(rowDataTuple) >= self.numCols),\
+              'Given data must have at least %d items.' %(self.numCols)
 
         for idx in range(self.numCols):
-            assert(isinstance(rowDataTuple[idx],(bytes,str,int))),'One or both data elements are not strings or numbers.'
+            assert(isinstance(rowDataTuple[idx], (bytes, str, int))),\
+                  'One or both data elements are not strings or numbers.'
 
-        self.rowDataTupleTruncated = tuple(rowDataTuple[:self.numCols])
+        rowDataTupleTruncated = tuple(rowDataTuple[:self.numCols])
 
-        if (self.rowDataTupleTruncated not in self.entriesList):
+        if rowDataTupleTruncated not in self.entriesList:
 
-            if (not self.haveEntries):
+            if not self.haveEntries:
                 self.DeleteAllItems()
 
-            self.Append(self.rowDataTupleTruncated)
-  
-            self.entriesList.append(self.rowDataTupleTruncated)
-    
+            self.Append(rowDataTupleTruncated)
+
+            self.entriesList.append(rowDataTupleTruncated)
+
             self.numEntries += 1
             self.haveEntries = True
 
@@ -137,30 +143,28 @@ class FileCtrl(wx.ListCtrl):
     # def GetEntriesList(self):
     #     return self.numEntries
     def Autosize(self):
-        for colIndex in [1,2,3]:
+        for colIndex in [1, 2, 3]:
             col_width = self.GetColumnWidth(colIndex)
-            self.SetColumnWidth( colIndex, wx.LIST_AUTOSIZE )
-            ColMaxWid = self.GetClientSize()[ 0 ] / 2      # Half the avaiable width.
+            self.SetColumnWidth(colIndex, wx.LIST_AUTOSIZE)
+            ColMaxWid = self.GetClientSize()[0] / 2      # Half the avaiable width.
                           # Avoid the use of "Magic Numbers".
-            input_width = self.GetColumnWidth( colIndex )
-            reasonableWid = max( col_width, input_width )
-            finalWid = min(reasonableWid,ColMaxWid)
-            self.SetColumnWidth( colIndex, reasonableWid )
-            
+            input_width = self.GetColumnWidth(colIndex)
+            reasonableWid = max(col_width, input_width)
+            finalWid = min(reasonableWid, ColMaxWid)
+            self.SetColumnWidth(colIndex, finalWid)
+
     def GetEntries(self):
         # print(self.entriesList)
         return self.entriesList
     def ErrorProcess(self):
-        
         pass
 
     def GetCol(self, path, name, select_type):
-        
         _path = path
         _name = name
         _select_type = select_type
         os.chdir(_path)
-        
+
         if _select_type == 'errors':
             # sp = {}
             col_info = [_name]
@@ -174,10 +178,10 @@ class FileCtrl(wx.ListCtrl):
             col_info.append(sp)
             return col_info
         #TODO: EXCEL LOGIC
-        
-        
 
-    
+
+
+
     #TODO: OLD GETCOL LOGIC
     # def GetCol(self,pathlist,type_list,path_list,name_list):
     #     # print(self.entriesList)
